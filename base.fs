@@ -1,6 +1,19 @@
 \ Identity function, useful as a hash function for ints
 : id ;
 
+\ Emits a \n on stdout.
+: crlf 10 emit ;
+
+\ Allots nb bytes, zeroed, and returns a pointer to them.
+: zallot ( nb -- ptr )
+	here over allot swap over swap erase
+;
+
+\ Allots nc cells, zeroed, and returns a pointer to them.
+: zcallot ( nc -- ptr ) cells zallot ;
+
+: uncallot ( nc -- ) -1 * cells allot ;
+
 \ Given a string, remove a trailing newline if there is one.
 : chomp ( addr u -- addr u )
 	2dup 1- + c@ 10 = if ( addr u )
@@ -77,8 +90,8 @@
 \ output a success/failure message.
 : advcheck ( v0 v1 s-a s-n )
 	2swap 2dup = if
-		2drop type S"  ok" type bl emit
+		2drop type bl emit
 	else
-		2swap type S"  broken: " type . S" != " type . bl emit
+		10 emit 2swap type S"  broken: " type . S" != " type . 10 emit
 	endif
 ;
