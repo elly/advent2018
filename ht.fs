@@ -31,7 +31,7 @@ end-struct ht%
 
 : htbsearch ( ef key bptr -- bptr )
 	dup 0 = if
-		drop 0 0 exit
+		2drop drop 0 exit
 	endif
 	begin
 		( ef key bptr )

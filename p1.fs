@@ -1,7 +1,5 @@
 S" base.fs" included
-
-\ Set this to -1 to get progress updates on p1b.
-variable debug 0 debug !
+S" ht.fs" included
 
 \ The core of p1a: loops over the supplied token vector (see ASPLIT), keeping
 \ track of the total delta as it goes; returns the total.
@@ -26,36 +24,12 @@ variable debug 0 debug !
 	asplit dotokensa
 ;
 
-\ Given the address and length of a vector of cells and a value, returns
-\ whether any cell in that vector has that value.
-: visited? ( addr n k -- f )
-	over 0 = if
-		2drop drop 0 exit
-	endif
-	swap 0 do
-		( addr k )
-		over i cells + @ ( addr k v )
-		over = if
-			2drop -1 unloop exit
-		endif
-	loop
-	2drop 0
+: visited-h? ( ht k -- f )
+	htget nip
 ;
 
-\ Given the address and length of a vector of cells and a new value k to add,
-\ returns the address and length of a new vector of cells, which is the same
-\ as the input vector except that k is appended.
-: visit ( addr n k -- naddr nn )
-	-rot ( k addr n )
-	dup 0 = if
-		drop 1 cells allocate throw
-	else
-		swap over cells cell+ resize throw ( k n naddr )
-	endif
-	swap over ( k naddr n naddr )
-	over cells + ( k naddr n naddr+n )
-	3 pick swap ! ( k naddr n )
-	rot drop 1+
+: visit-h ( ht k -- )
+	-1 htput
 ;
 
 \ The core of p1b: takes a token vector as input, and endlessly applies deltas
@@ -65,19 +39,15 @@ variable debug 0 debug !
 : dotokensb ( addr n -- first )
 	{ addr n }
 	0 { total }
-	0 0 0 visit { va vn }
+	ihtalloc { vh }
+	vh 0 visit-h
 	begin
 		addr n 0 do
 			dup i cells 2 * + 2@ str>delta total + to total
-			va vn total visited? if
+			vh total visited-h? if
 				unloop total exit
 			endif
-			va vn total visit to vn to va
-			\ When debugging is enabled, print a progress report
-			\ every 100 iterations.
-			vn 100 mod 0 = debug @ and if
-				vn .
-			endif
+			vh total visit-h
 		loop
 	again
 ;
@@ -101,8 +71,8 @@ variable debug 0 debug !
 	S" -6 +3 +8 +5 -6"   p1b 5  S" p1b/ex4" advcheck
 	S" +7 +7 -2 -7 -4"   p1b 14 S" p1b/ex5" advcheck
 
-	10 emit
-
 	\ slow!
-	\ p1slurp p1b 413 S" p1b" advcheck
+	p1slurp p1b 413 S" p1b" advcheck
+
+	10 emit
 ;
