@@ -66,8 +66,9 @@ create linebuf maxline 2 + allot
 
 1000 constant ARRAYSZ
 
-: mkarr
+: mkarr ( -- arr )
 	ARRAYSZ dup * cells allocate throw
+	dup ARRAYSZ dup * cells erase
 ;
 
 : acp ( array x y -- p )
@@ -111,6 +112,35 @@ create linebuf maxline 2 + allot
 	mkarr -rot rdclaims over swap acs dup count>1 swap free throw
 ;
 
+: noover ( arr claim -- f )
+	dup claim-h @ 0 do
+		dup claim-w @ 0 do
+			( array claim )
+			over over claim-x @ i + ( array claim array x )
+			2 pick claim-y @ j + ( array claim array x y )
+			acp @ 1 <> if
+				unloop unloop 0 exit
+			endif
+		loop
+	loop
+	2drop -1
+;
+
+: nooveri ( arr claims -- id )
+	begin
+		2dup noover if
+			claim-num @ nip exit
+		endif
+		claim-next @
+		dup 0=
+	until
+	2drop 0
+;
+
+: p3b ( fn-addr u -- id )
+	mkarr -rot rdclaims 2dup acs over swap nooveri swap free throw
+;
+
 : tests>c
 	S" #1 @ 2,3: 4x5" s>c ( claim )
 	dup claim-num @ 1 S" p3/s>c1" advcheck
@@ -151,5 +181,9 @@ create linebuf maxline 2 + allot
 	tests>c
 	testac
 
-	S" p3test.txt" p3a 4 S" p3a" advcheck
+	S" p3test.txt" p3a 4 S" p3a/1" advcheck
+	S" p3in.txt" p3a 101196 S" p3a/2" advcheck
+
+	S" p3test.txt" p3b 3 S" p3b/1" advcheck
+	S" p3in.txt" p3b 243 S" p3b/2" advcheck
 ;
