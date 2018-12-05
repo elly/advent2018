@@ -212,6 +212,70 @@ create linebuf maxline 2 + allot
 	*
 ;
 
+: agid ( buf gid -- )
+	here 2 pick - cell / 0 ?do ( buf gid )
+		over i cells + @ over ( buf gid thisgid gid )
+		= if
+			unloop 2drop exit
+		endif
+	loop
+	, drop
+;
+
+: gids ( ev3s n -- gids n )
+	here { seen }
+	0 do ( ev3s )
+		dup i cells 3 * + @ ( ev3s gid )
+		seen swap agid ( ev3s )
+	loop
+	drop seen here seen - cell /
+;
+
+: buildgmap ( ev3s nev3 gids ngids -- gmap )
+	ihtalloc { gmap }
+	dup 0 do ( ev3s nev3 gids ngids )
+		2swap 2dup ( gids ngids ev3s nev3 ev3s nev3 )
+		5 pick i cells + @ ( gids ngids ev3s nev3 ev3s nev3 gid )
+		minvec ( gids ngids ev3s nev3 mv )
+		4 pick i cells + @ ( gids ngids ev3s nev3 mv gid )
+		swap gmap -rot htput ( gids ngids ev3s nev3 )
+		2swap
+	loop
+	2drop 2drop gmap
+;
+
+: sleepy2 ( gmap gids n -- gid s )
+	0 0 0 { ms mi mv }
+	0 do ( gmap gids )
+		dup i cells + @ ( gmap gids gid )
+		2 pick swap htget ( gmap gids mv )
+		0= if crash! endif
+		dup 
+		maxmin ( gmap gids mvec m )
+		2dup cells + @ ( gmap gids mvec m mval )
+		dup mv > if
+			to mv
+			to ms
+			over i cells + @ to mi
+		else
+			2drop
+		endif
+		drop
+	loop
+	2 drop mi ms
+;
+
+: p4b ( fn-addr u -- gv )
+	rdents 2dup sortents flatpairs 2dup gids
+	2swap 2over buildgmap ( gids ngids gmap )
+	{ gmap } gmap
+	-rot sleepy2 2swap 2drop
+	*
+	\ not: 35472 (too low)
+	\ not: 36211
+	\ it was 37886!
+;
+
 : tests>ent
 	S" [1518-11-01 03:45] Guard #10 begins shift" s>ent
 		dup ent-evt @ EGUARD S" p4/s>ent0" advcheck
@@ -234,4 +298,10 @@ create linebuf maxline 2 + allot
 : test
 	tests>ent
 	testsortents
+
+	S" p4test.txt" p4a 240 S" p4a/1" advcheck
+	S" p4in.txt" p4a 35184 S" p4a/2" advcheck
+
+	S" p4test.txt" p4b 4455 S" p4b/1" advcheck
+	S" p4in.txt" p4b 37886 S" p4b/2" advcheck
 ;
