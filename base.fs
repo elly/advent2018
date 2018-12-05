@@ -1,6 +1,8 @@
 \ Identity function, useful as a hash function for ints
 : id ;
 
+: crash! 0 @ ;
+
 \ Emits a \n on stdout.
 : crlf 10 emit ;
 
@@ -86,6 +88,23 @@
 	s>number? 2drop
 ;
 
+\ Sorts an array in-place using the given greater-than predicate.
+: sort ( addr n gt -- )
+	begin
+		-1 \ progress flag
+		2 pick 1 do ( addr n gt prog )
+			3 pick i 1- cells + 2@ ( addr n pred prog a[i-i] a[i] )
+			3 pick execute ( addr n pred prog f )
+			if
+				3 pick i 1- cells + dup 2@
+				swap rot 2!
+				drop 0
+			endif
+		loop
+	until
+	drop drop drop
+;
+
 \ For unit-testing, checks whether v0 and v1 are equal, and uses s-a and s-n to
 \ output a success/failure message.
 : advcheck ( v0 v1 s-a s-n )
@@ -94,4 +113,15 @@
 	else
 		10 emit 2swap type S"  broken: " type . S" != " type . 10 emit
 	endif
+;
+
+: testsort
+	here dup 9 , 3 , 1 , 7 , 5 ,
+	5 ['] < sort
+	dup           @ 1 S" b/sort1" advcheck
+	dup 1 cells + @ 3 S" b/sort2" advcheck
+	dup 2 cells + @ 5 S" b/sort3" advcheck
+	dup 3 cells + @ 7 S" b/sort4" advcheck
+	dup 4 cells + @ 9 S" b/sort5" advcheck
+	-5 cells allot
 ;
