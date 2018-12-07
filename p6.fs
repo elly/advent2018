@@ -10,11 +10,11 @@ S" base.fs" included
 ;
 
 : pack ( x y -- pt )
-	10000 + 0xffff and 16 lshift swap 10000 + 0xffff and or
+	30000 + 0xffff and 16 lshift swap 30000 + 0xffff and or
 ;
 
 : unpack ( pt -- x y )
-	dup 0xffff and 10000 - swap 16 rshift 0xffff and 10000 -
+	dup 0xffff and 30000 - swap 16 rshift 0xffff and 30000 -
 ;
 
 : md ( pt0 pt1 -- n )
@@ -141,6 +141,31 @@ create linebuf maxline 2 + allot
 : p6a ( fn-addr u -- n )
 	p6slurp 2dup countps -rot infcounts 2dup zeroinfs drop maxp
 ;
+
+: dtoall ( pts n pt )
+	-rot 0 swap 0 do ( pt pts total )
+		over i cells + @ ( pt pts total thispt )
+		3 pick md ( pt pts total d )
+		+
+	loop
+	-rot 2drop
+;
+
+: nsafe ( pts n -- n )
+	{ sd }
+	0 { total }
+	500 -500 do
+		500 -500 do
+			2dup i j pack dtoall ( pts n d )
+			sd < if
+				total 1+ to total
+			endif
+		loop
+	loop
+	2drop total
+;
+
+: p6b p6slurp 10000 nsafe ;
 
 : testpack
 	3 5 pack unpack
