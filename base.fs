@@ -115,6 +115,18 @@
 	endif
 ;
 
+: xx ( addr n -- )
+	0 do
+		dup i cells + @ .
+	loop
+;
+
+: xxc ( c-addr n -- )
+	0 do
+		dup i + c@ .
+	loop
+;
+
 : testsort
 	here dup 9 , 3 , 1 , 7 , 5 ,
 	5 ['] < sort
