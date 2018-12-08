@@ -48,12 +48,12 @@ S" base.fs" included
 \ a new tree. The recursive calls (see RECURSE in the body) in turn consume
 \ from vaddr, which takes care of skipping over the contents of child trees.
 : mktree ( vaddr n -- vaddr n tree )
-	rdhead alloctree { tree } ( addr n )
-	tree nc 0 ?do ( addr n )
-		recurse tree i cp ! ( addr n )
+	rdhead alloctree { tree } ( vaddr n )
+	tree nc 0 ?do ( vaddr n )
+		recurse tree i cp ! ( vaddr n )
 	loop
-	tree nm 0 ?do ( addr n )
-		rdint tree i mp ! ( addr n )
+	tree nm 0 ?do ( vaddr n )
+		rdint tree i mp ! ( vaddr n )
 	loop
 	tree
 ;
