@@ -25,17 +25,13 @@ S" base.fs" included
 
 : mktree ( addr n -- addr n tree )
 	rdhead alloctree { tree } ( addr n )
-	0 tree nc 0 ?do ( addr n ci )
-		-rot recurse ( ci addr n child )
-		tree 4 pick cp ! ( ci addr n )
-		rot 1+
+	tree nc 0 ?do ( addr n )
+		recurse tree i cp ! ( addr n )
 	loop
-	drop 0 tree nm 0 ?do ( addr n mi )
-		-rot rdint ( mi addr n m )
-		tree 4 pick mp ! ( mi addr n )
-		rot 1+
+	tree nm 0 ?do ( addr n )
+		rdint tree i mp ! ( addr n )
 	loop
-	drop tree
+	tree
 ;
 
 : p8slurp ( c-addr n -- addr n )
