@@ -78,3 +78,11 @@ S" base.fs" included
 : p8b ( c-addr n -- n )
 	p8slurp mktree nodeval
 ;
+
+: test
+	S" p8test.txt" p8a 138 S" p8a/1" advcheck
+	S" p8in.txt" p8a 46096 S" p8a/2" advcheck
+
+	S" p8test.txt" p8b 66 S" p8b/1" advcheck
+	S" p8in.txt" p8b 24820 S" p8b/2" advcheck
+;
