@@ -1,7 +1,7 @@
 #lang racket
 
 (require "base.scm")
-(provide (all-defined-out))
+(provide p4a p4b)
 
 (struct dt (year month day hour min) #:transparent)
 (struct event (dt id type) #:transparent)

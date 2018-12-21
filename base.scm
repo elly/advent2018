@@ -3,6 +3,7 @@
 (provide file-lines letter->integer vector-modify!)
 (provide point point-x point-y)
 (provide rect rect-x rect-y rect-w rect-h for-rect-points)
+(provide fix until)
 (provide d@ d$ d-> d$! d->!)
 (provide e@ e+ e- e+! e-!)
 (provide s// srm s->n)
@@ -46,6 +47,19 @@
           (begin
             (f (point+ (rect-origin r) (point xi yi)))
             (loop (+ xi 1) yi (+ c 1)))))))
+
+(define (fix f in)
+  (let loop ((in in) (out (f in)))
+    (printf "fix: ~a~n" (vector-length in))
+    (if (equal? in out)
+      in
+      (loop out (f out)))))
+
+(define (until f in)
+  (let loop ((in in) (out (f in)))
+    (if (not out)
+      in
+      (loop out (f out)))))
 
 (define d@ dict-ref)
 (define d$ dict-set)
