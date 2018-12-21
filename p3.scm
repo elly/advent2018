@@ -3,7 +3,6 @@
 (require "base.scm")
 
 (provide p3a p3b)
-(provide (all-defined-out))
 
 (struct claim (id rect))
 
