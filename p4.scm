@@ -108,8 +108,22 @@
         (* sg sm)))))
 
 (define (gids sleeps)
-  (foldl
-    (lambda (e ids)
-      (set-add ids (sleep-id e)))
-    (set) sleeps))
+  (set->list
+    (foldl
+      (lambda (e ids)
+        (set-add ids (sleep-id e)))
+      (set) sleeps)))
 
+(define (sleepiest2 sleeps)
+  (let ((ids (gids sleeps)))
+    (argmax
+      (lambda (i)
+        (let ((m (sleepy-map sleeps i)))
+          (vector-ref m (sleepy-minute sleeps i))))
+      ids)))
+
+(define (p4b fn)
+  (let ((es (flatten (identify (parse fn)))))
+    (let ((sg (sleepiest2 es)))
+      (let ((sm (sleepy-minute es sg)))
+        (* sm sg)))))
