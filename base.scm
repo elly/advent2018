@@ -1,7 +1,7 @@
 #lang racket
 
 (provide file-lines letter->integer vector-modify!)
-(provide point point-x point-y)
+(provide point point-x point-y point+)
 (provide rect rect-x rect-y rect-w rect-h for-rect-points)
 (provide fix until)
 (provide d@ d$ d-> d$! d->!)

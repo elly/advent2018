@@ -2,7 +2,7 @@
 ; p5.scm - aoc2018d5
 
 (require "base.scm")
-(provide (all-defined-out))
+(provide part-a part-b)
 
 (define (parse fn)
   (list->vector (string->list (car (file-lines fn)))))
