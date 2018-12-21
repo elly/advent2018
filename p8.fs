@@ -109,6 +109,18 @@ S" base.fs" included
 	p8slurp mktree nodeval
 ;
 
+: depth ( tree -- n )
+	dup nc 0= if
+		drop 1 exit
+	endif
+	0 over nc 0 ?do ( tree max )
+		over i cp @ ( tree max child )
+		recurse ( tree max cd )
+		2dup < if nip else drop endif
+	loop
+	1+ nip
+;
+
 : test
 	S" p8test.txt" p8a 138 S" p8a/1" advcheck
 	S" p8in.txt" p8a 46096 S" p8a/2" advcheck
