@@ -28,17 +28,17 @@
 (define *erx-wake* #px"wakes up")
 
 (define (parse-minsec s)
-  (let ((s0 (string-replace (string-replace s "-" " ") ":" " ")))
-    (apply dt (map string->number (string-split s0)))))
+  (let ((s0 (s// (s// s "-" " ") ":" " ")))
+    (apply dt (map s->n (string-split s0)))))
 
 (define (parse-line l)
-  (let ((mg (regexp-match *erx-any* l)))
+  (let ((mg (srm *erx-any* l)))
     (let ((t (parse-minsec (second mg))))
-      (let ((gp (regexp-match *erx-gid* (third mg)))
-            (sp (regexp-match *erx-sleep* (third mg)))
-            (wp (regexp-match *erx-wake* (third mg))))
+      (let ((gp (srm *erx-gid* (third mg)))
+            (sp (srm *erx-sleep* (third mg)))
+            (wp (srm *erx-wake* (third mg))))
         (cond
-          (gp (event t (string->number (second gp)) 'id))
+          (gp (event t (s->n (second gp)) 'id))
           (sp (event t #f 'sleep))
           (wp (event t #f 'wake)))))))
 
@@ -50,7 +50,7 @@
     (let loop ((es es) (gid #f) (nes '()))
       (if (null? es)
         (reverse nes)
-        (let ((e (car es)) (rest (cdr es)))
+        (let ((e (car es)))
           (if
             (symbol=? (event-type e) 'id)
             (loop (cdr es) (event-id e) nes)
@@ -72,8 +72,8 @@
   (let ((m (make-hash)))
     (for-each
       (lambda (s)
-        (hash-update! m (sleep-id s)
-          (lambda (v) (+ v (sleep-dur s)))
+        (d->! m (sleep-id s)
+          (curry + (sleep-dur s))
           0))
       sleeps)
     (car (argmax second (hash-map m list)))))
@@ -88,8 +88,7 @@
               #f
               (begin
                 (let ((ix (+ (dt-min (sleep-dt s)) i)))
-                  (vector-set! m ix
-                    (add1 (vector-ref m ix))))
+                  (d->! m ix add1))
                 (loop (+ i 1)))))
             #f))
       sleeps)
@@ -98,7 +97,7 @@
 (define (sleepy-minute sleeps gid)
   (let ((m (sleepy-map sleeps gid)))
     (vector-argmax
-      (lambda (i) (vector-ref m i))
+      (lambda (i) (d@ m i))
       (build-vector 60 (lambda (x) x)))))
 
 (define (p4a fn)
@@ -111,7 +110,7 @@
   (set->list
     (foldl
       (lambda (e ids)
-        (set-add ids (sleep-id e)))
+        (e+ ids (sleep-id e)))
       (set) sleeps)))
 
 (define (sleepiest2 sleeps)
@@ -119,7 +118,7 @@
     (argmax
       (lambda (i)
         (let ((m (sleepy-map sleeps i)))
-          (vector-ref m (sleepy-minute sleeps i))))
+          (d@ m (sleepy-minute sleeps i))))
       ids)))
 
 (define (p4b fn)

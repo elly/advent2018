@@ -3,6 +3,9 @@
 (provide file-lines letter->integer vector-modify!)
 (provide point point-x point-y)
 (provide rect rect-x rect-y rect-w rect-h for-rect-points)
+(provide d@ d$ d-> d$! d->!)
+(provide e@ e+ e- e+! e-!)
+(provide s// srm s->n)
 
 (struct point (x y) #:transparent)
 (struct rect (x y w h) #:transparent)
@@ -43,3 +46,19 @@
           (begin
             (f (point+ (rect-origin r) (point xi yi)))
             (loop (+ xi 1) yi (+ c 1)))))))
+
+(define d@ dict-ref)
+(define d$ dict-set)
+(define d-> dict-update)
+(define d$! dict-set!)
+(define d->! dict-update!)
+
+(define e@ set-member?)
+(define e+ set-add)
+(define e- set-remove)
+(define e+! set-add!)
+(define e-! set-remove!)
+
+(define s// string-replace)
+(define srm regexp-match)
+(define s->n string->number)
