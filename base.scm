@@ -1,5 +1,6 @@
 #lang racket
 
+(provide id)
 (provide file-lines letter->integer vector-modify!)
 (provide point point-x point-y point+)
 (provide rect rect-x rect-y rect-w rect-h for-rect-points)
@@ -22,6 +23,8 @@
 (define (point=? p0 p1)
   (and (= (point-x p0) (point-x p1))
        (= (point-y p0) (point-y p1))))
+
+(define (id x) x)
 
 (define (file-lines fn)
   (let ((f (open-input-file fn)))
