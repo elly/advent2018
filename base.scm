@@ -2,8 +2,9 @@
 
 (provide id)
 (provide file-lines letter->integer vector-modify!)
-(provide point point-x point-y point+)
+(provide point point-x point-y point+ point=?)
 (provide rect rect-x rect-y rect-w rect-h for-rect-points)
+(provide rect-right rect-bottom rect-bounding)
 (provide fix until)
 (provide d@ d$ d-> d$! d->!)
 (provide e@ e+ e- e+! e-!)
@@ -15,6 +16,12 @@
 
 (define (rect-origin r)
   (point (rect-x r) (rect-y r)))
+
+(define (rect-right r)
+  (+ (rect-x r) (rect-w r)))
+
+(define (rect-bottom r)
+  (+ (rect-y r) (rect-h r)))
 
 (define (point+ p0 p1)
   (point (+ (point-x p0) (point-x p1))
@@ -51,6 +58,13 @@
           (begin
             (f (point+ (rect-origin r) (point xi yi)))
             (loop (+ xi 1) yi (+ c 1)))))))
+
+(define (rect-bounding pts)
+  (let ((xs (map point-x pts)) (ys (map point-y pts)))
+    (rect (apply min xs)
+          (apply min ys)
+          (add1 (- (apply max xs) (apply min xs)))
+          (add1 (- (apply max ys) (apply min ys))))))
 
 (define (fix f in)
   (let loop ((in in) (out (f in)))
