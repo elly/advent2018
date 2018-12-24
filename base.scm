@@ -7,6 +7,7 @@
 (provide d@ d$ d-> d$! d->!)
 (provide e@ e+ e- e+! e-!)
 (provide s// srm s->n)
+(provide char-)
 
 (struct point (x y) #:transparent)
 (struct rect (x y w h) #:transparent)
@@ -76,3 +77,6 @@
 (define s// string-replace)
 (define srm regexp-match)
 (define s->n string->number)
+
+(define (char- c0 c1)
+  (- (char->integer c0) (char->integer c1)))
